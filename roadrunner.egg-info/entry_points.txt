@@ -1,4 +1,0 @@
-
-      [console_scripts]
-      roadrunner = roadrunner.runner:main
-      

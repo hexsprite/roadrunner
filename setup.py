@@ -9,7 +9,7 @@ setup(name='roadrunner',
       long_description="""\
 """,
       classifiers=[], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
-      keywords='',
+      keywords='zope buildout TDD testing',
       author='Jordan Baker',
       author_email='jbb@scryent.com',
       url='',
@@ -21,7 +21,7 @@ setup(name='roadrunner',
           # -*- Extra requirements: -*-
       ],
       entry_points = """
-      [console_scripts]
-      roadrunner = roadrunner.runner:main
+        [console_scripts]
+        roadrunner = roadrunner.runner:main
       """
       )
