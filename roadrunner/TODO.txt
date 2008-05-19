@@ -1,0 +1,15 @@
+- Find a way to potentially reload all dependencies. Perhaps we could create
+  process snapshots at various points along the initialization process and then
+  use the most relevant one to build on top of.
+  
+- We could fork at various points in the init process.  Each fork could be
+registered by name so we could resume from any particular point we want using
+a simple API to script the children.
+
+For example you could store one fork for just before the Plone core init but after the main Zope init.
+
+something like: 
+
+process.restore('zope:after', next_action='plone')
+
+- integrate a way to reload the modules.  if its a Zope module we need to be able to re-init.  how does Zope's reload module do it?
