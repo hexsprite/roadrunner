@@ -1,15 +1,36 @@
+- eliminate the need to comment out the package under test in ZCML.
+
 - Find a way to potentially reload all dependencies. Perhaps we could create
-  process snapshots at various points along the initialization process and then
-  use the most relevant one to build on top of.
-  
-- We could fork at various points in the init process.  Each fork could be
-registered by name so we could resume from any particular point we want using
-a simple API to script the children.
+  process snapshots at various points along the initialization process and
+  then use the most relevant one to build on top of.
 
-For example you could store one fork for just before the Plone core init but after the main Zope init.
+- Or barring that a way to detect when things change and notify the user. Make
+  it easy to restart the test process.
 
-something like: 
+- We could fork at various points in the init process. Each fork could be
+  registered by name so we could resume from any particular point we want
+  using a simple API to script the children.
+
+- Forks should not take up a lot of space but basically would be event
+  reactors holding copy on write memory.
+
+For example you could store one fork for just before the Plone core init but
+after the main Zope init.
+
+something like:
 
 process.restore('zope:after', next_action='plone')
 
-- integrate a way to reload the modules.  if its a Zope module we need to be able to re-init.  how does Zope's reload module do it?
+- integrate a way to reload the modules. if its a Zope module we need to be
+  able to re-init. how does Zope's reload module do it?
+
+from App import RefeshFuncs
+
+
+
+Zope appserver support:
+
+- What would be really cool is to preload Zope & Plone component and then fork
+  right before loading your specific products. might require some nasty zope
+  hacks.
+  

@@ -9,25 +9,6 @@ PloneTestCase.
 Tests are then run in a loop.  You are given a shell-like environment with
 command history where you can select different tests, etc.
 
-Limitations
-===========
-
-Because it preloads the Plone environment you won't be able to see changes
-to the Core Plone components.  However, it should see all changes in your
-application code which is what you will most likely be changing anyways.
-
-Currently you may need to remove any modules under test from the zcml line in
-your [instance] section so that it will only initialize your test environment.
-
-If you follow normal testing conventions you will be loading your ZCML
-as a layer setup deferred anyways.
-
-Theoretically this should be able to work with any test environment (eg. 
-Django, TG, Twisted).
-
-I eventually plan to do this, and would accept any patches in the meantime
-if anyone feels so inclined.
-
 How to use it?
 ==============
 
@@ -52,6 +33,31 @@ Yes it's ugly.  It will get fixed eventually.
 Then you can run roadrunner::
 
   $ bin/roadrunner -s Products.PasswordResetTool
+
+Limitations
+===========
+
+Because it preloads the Plone environment you won't be able to see changes
+to the Core Plone components.  However, it should see all changes in your
+application code which is what you will most likely be changing anyways.
+
+Currently you may need to remove any modules under test from the zcml line in
+your [instance] section so that it will only initialize your test environment.
+
+If you follow normal Plone testing conventions you will be loading your ZCML
+as a layer setup deferred anyways.
+
+Theoretically this should be able to work with any test environment (eg. 
+Django, TG, Twisted).
+
+I eventually plan to do this, and would accept any patches in the meantime
+if anyone feels so inclined.
+
+
+Tested With
+===========
+
+Plone 3.1.  Should work with Plone 3.0.  Plone 2.5... who knows?
 
 Author
 ======

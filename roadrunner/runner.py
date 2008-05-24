@@ -68,7 +68,10 @@ def main(zope_conf, software_home, buildout_home, args=sys.argv):
     defaults = testrunner_defaults()
     defaults = setup_paths(defaults, software_home, buildout_home)
     
-    saved_time = 0
+    # start out negative because the first run through we don't actually save time
+    # since we would have had to load it anyways
+    saved_time = -preload_time
+    
     while 1:
         # Test Loop Start
         pid = os.fork()
@@ -85,6 +88,9 @@ def main(zope_conf, software_home, buildout_home, args=sys.argv):
             # In parent process
             try:
                 status = os.wait()
+                saved_time += preload_time
+                if saved_time:
+                    print "Saved time so far: %0.3f seconds." % saved_time
                 # print "\nchild process returned: ", repr(status)
             except OSError:
                 print "\nchild process was interrupted!"

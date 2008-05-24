@@ -14,6 +14,8 @@
 """Test runner
 
 $Id: testrunner.py 69364 2006-08-07 15:56:38Z adamg $
+
+PATCHED VERSION for roadrunner
 """
 
 # Too bad: For now, we depend on zope.testing.  This is because
