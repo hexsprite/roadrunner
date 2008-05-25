@@ -18,10 +18,14 @@ setup(name='roadrunner',
       include_package_data=True,
       zip_safe=False,
       install_requires=[
-          # -*- Extra requirements: -*-
+          'pexpect', # should really be a test_requires
+          'zc.recipe.egg',
+          'zc.buildout',
       ],
       entry_points = """
         [console_scripts]
-        roadrunner = roadrunner.runner:main
+        rrplone = roadrunner.runner:plone
+        [zc.buildout]
+        plone = roadrunner:Plone
       """
       )

@@ -49,9 +49,11 @@ def run_commandloop(args):
             break
 
     return args
-    
-def main(zope_conf, software_home, buildout_home, args=sys.argv):
-    sys.argv = ['fakepath'] # Zope configure whines about argv stuff make it shutup
+
+# 
+def plone(zope_conf, preload_modules, packages_under_test, zope2_location, buildout_home, part_dir, args=sys.argv):
+    software_home = zope2_location + "/lib/python"
+    sys.argv = sys.argv[0:1] # Zope configure whines about argv stuff make it shutup
     bootstrap_zope(zope_conf)
     args = args[1:]
     if HAVE_READLINE:
@@ -59,7 +61,7 @@ def main(zope_conf, software_home, buildout_home, args=sys.argv):
 
     ## preload test environment
     t1 = time.time()
-    setup_layers = preload_plone()
+    setup_layers = preload_plone(part_dir)
     #setup_layers = {}
     t2 = time.time()
     preload_time = t2-t1
@@ -78,7 +80,8 @@ def main(zope_conf, software_home, buildout_home, args=sys.argv):
         if not pid:
             # Run tests in child process
             t1 = time.time()
-            rc = testrunner.run(defaults=defaults, args=['rr'] + args,
+            print repr(defaults)
+            rc = testrunner.run(defaults=defaults, args=[sys.argv[0]] + args,
                                 setup_layers=setup_layers)
             t2 = time.time()
             print 'Testrunner took: %0.3f seconds.  ' % ((t2-t1))
@@ -102,10 +105,9 @@ def main(zope_conf, software_home, buildout_home, args=sys.argv):
 
 def bootstrap_zope(config_file):
     config_file = os.path.abspath(config_file)
-    print "Parsing %s" % config_file
     import Zope2
     Zope2.configure(config_file)
-
+    
 def filter_warnings():
     import warnings
     warnings.simplefilter('ignore', Warning, append=True)
@@ -176,15 +178,14 @@ def setup_paths(defaults, software_home, buildout_home):
             defaults += ['--test-path', path]
 
     return defaults
-    
-def preload_plone():
+
+def preload_plone(conf):
     print "Preloading Plone ..."
     from Products.PloneTestCase.layer import PloneSite
     from Products.PloneTestCase import PloneTestCase as ptc
     ptc.setupPloneSite()
     # pre-setup Plone layer
     setup_layers={}
-    # import pdb; pdb.set_trace()
     testrunner.setup_layer(PloneSite, setup_layers)
     # delete the plone layer registration so that the testrunner
     # will re-run Plone layer setUp after deferred setups have
@@ -213,5 +214,3 @@ def register_signal_handlers(pid):
     # # restore signal handler
     # signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-if __name__ == '__main__':
-    main()
