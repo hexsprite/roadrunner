@@ -1,8 +1,5 @@
-import os, logging
-import zc.buildout
+import os, fnmatch, shutil
 from zc.recipe.egg.egg import Scripts
-import shutil
-import re
 
 class RoadrunnerRecipe(Scripts):
     """
@@ -51,7 +48,7 @@ part_dir = '%(part_dir)s'
 """ % vars
         options['arguments'] = 'zope_conf, preload_modules, packages_under_test, zope2_location, buildout_home, part_dir'
         options['extra_paths']="%(zope2_location)s/lib/python" % vars
-        # options['scripts'] = self.name + '=rrplone'
+        options['scripts'] = 'rrplone=' + self.name 
             
         return super(RoadrunnerRecipe, self).install()
         
@@ -68,19 +65,24 @@ class RoadrunnerPloneRecipe(RoadrunnerRecipe):
     # def __init__(self, buildout, name, options):
     #     super(RoadrunnerPloneRecipe, self).__init__(buildout, name, options)
 
-    def is_package_under_test(self, path):
-        for pat in self.packages_under_test:
-            if re.compile(pat).search(path):
+    def is_package_under_test(self, filepath):
+        for pattern in self.packages_under_test:
+            if fnmatch.fnmatch(filepath, '*' + pattern + '*'):
                 return True
         return False
         
-    def configure_roadrunner_conf(self):
-        # filter out ZCML files on load
-        instance = self.instance_part['location']
-        # zcml_src = self.instance_part['location'] + "/etc/package-includes"
-        zcml_dest = self.part_dir + "/etc/package-includes"
-        # shutil.copytree(zcml_src, zcml_dest)
+    def configure_roadrunner_instance(self):
+        """
+        copy a zope instance to work with roadrunner packages under test
+        """
+        if os.path.exists(self.part_dir):
+            shutil.rmtree(self.part_dir)
 
+        instance = self.instance_part['location']
+        shutil.copytree(instance, self.part_dir)
+        
+        # filter out packages under test to load from site.zcml
+        zcml_dest = self.part_dir + "/etc/package-includes"
         for dirpath, dirnames, filenames in os.walk(zcml_dest):
             for filename in filenames:
                 if self.is_package_under_test(filename):
@@ -88,28 +90,14 @@ class RoadrunnerPloneRecipe(RoadrunnerRecipe):
                     print "removing", path
                     os.remove(path)
         
-        # zope.conf
+        # rewrite the old paths => new in zope.conf
         zopeconf_dest =  "%s/etc/zope.conf" % self.part_dir
         zopeconf = file(zopeconf_dest).read()
         zopeconf = zopeconf.replace(instance, self.part_dir)
         file(zopeconf_dest, "w").write(zopeconf)
-        
-        # os.copy("%s/etc/zope.conf" % instance, zopeconf_dest)
-
-        shutil.copy("%s/etc/site.zcml" % instance, "%s/etc/site.zcml" % self.part_dir)
-        
-        # substitute paths
-        # link package-includes but exclude packages_under_test
-        pass
-        
+    
     def install(self):
-        if os.path.exists(self.part_dir):
-            shutil.rmtree(self.part_dir)
-
-        instance = self.instance_part['location']
-        shutil.copytree(instance, self.part_dir)
-        
-        self.configure_roadrunner_conf()
+        self.configure_roadrunner_instance()
         
         return super(RoadrunnerPloneRecipe, self).install() + [self.part_dir]
         

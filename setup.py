@@ -3,6 +3,18 @@ import sys, os
 
 version = '0.1.1'
 
+def read(*rnames):
+    return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
+
+long_description=(
+        read('README.txt')
+        + '\n' +
+        read('CHANGES.txt')
+        + '\n' +
+        'Download\n'
+        '**********************\n'
+        )
+        
 setup(name='roadrunner',
       version=version,
       description="",

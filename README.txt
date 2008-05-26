@@ -1,17 +1,14 @@
-roadrunner
-++++++++++
+Waiting for stuff sucks.
 
-because waiting for stuff sucks
+roadrunner is a looping testrunner with environment preloading for test-driven
+development.
 
-- A looping testrunner with environment preloading for test-driven
-  development.
+It preloads a standard Zope & Plone test environment compatible with
+PloneTestCase. After the first load of the test environment I have been 
+saving around 25s per test run on my Macbook Pro 2.16.
 
-- Preloads a standard Zope & Plone test environment compatible with
-  PloneTestCase.
+Other than that it pretty much works like the regular Zope testrunner.
 
-- Tests are then run in a loop. You are given a shell-like environment with
-  command history where you can select different tests, etc.
-  
 How to use it?
 ==============
 
@@ -23,17 +20,26 @@ Here's a sample part::
 
   [roadrunner]
   recipe = roadrunner:plone
-  packages-under-test = my.package.*
+  packages-under-test = my.package
+
+You can also match several packages using simple globbing, eg: my.packages.*
 
 This will create a new directory in parts named by the part containing a copy
-of your Zope instance environment.
+of your Zope instance environment but with the packages-under-test excluded
+from being loaded via ZCML by default.
+
+Make sure 
 
 Then you can run roadrunner::
 
-  $ bin/roadrunner -s my.package 
+  $ bin/roadrunner -s my.package
+  
+It will preload Zope & Plone, then fork off the first testrunner. Once the
+first testrunner is complete you will receive the roadrunner prompt where
+you launch additional tests.
 
-Limitations
-===========
+Gotchas
+=======
 
 - roadrunner is still a bit experimental. I haven't yet seen a situation where
   it did not work as planned, but it may expose if your test setup does things
