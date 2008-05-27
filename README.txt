@@ -28,8 +28,6 @@ This will create a new directory in parts named by the part containing a copy
 of your Zope instance environment but with the packages-under-test excluded
 from being loaded via ZCML by default.
 
-Make sure 
-
 Then you can run roadrunner::
 
   $ bin/roadrunner -s my.package
@@ -85,7 +83,7 @@ Author
 
 Send questions, comments & bug reports to:
 
-Jordan Baker <jbb@scryent.com>
+Jordan Baker <jbb@no_spam_plz_scryent.com>
 
 License
 =======

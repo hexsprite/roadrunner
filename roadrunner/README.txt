@@ -3,7 +3,7 @@ Testing roadrunner
 
 Warning for those who would run this buildout it is an insane test. In order
 to properly test things we build and run Plone.  For developing on roadrunner
-you could re-use an existing install to speed things up.
+you could re-use an existing Zope & Plone install to speed things up.
 
 First off let's create a sample buildout for roadrunner to run
 
@@ -103,7 +103,6 @@ Run the buildout:
   Generated script '/sample-buildout/bin/rrplone'.
   Unused options for roadrunner: 'package-under-test'.
   <BLANKLINE>
-  
   
 Run roadrunner and talk to it via pexpect module.
 

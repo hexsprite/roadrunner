@@ -1,13 +1,24 @@
 TODO
 ====
 
-- ability to preload any arbitrary layers, plus some presets like --plone or --grok.
+- bug: killing pdb sometimes results in stty -echo behaviour
+
+- restart the whole shebang if something preloaded changes.
+  https://bugs.launchpad.net/grok/+bug/213269
+
+- ability to preload any arbitrary layers, plus some presets like --plone or
+  --grok
+
+- or better still, the ability to determine which layers should be preloaded
+  based on the tests being run?
+
+- ability to run in testloop mode. Basically it will run in a loop and wait
+  for changes to be made to the project. After 15 seconds a new test run will
+  be made with the current parameters.
 
 - hooks for fixture configuration?
 
-- prevent layer destruction for an added half second
-
-- eliminate the need to comment out the package under test in ZCML.
+- prevent layer destruction for an added half second (not necessary)
 
 - Find a way to potentially reload all dependencies. Perhaps we could create
   process snapshots at various points along the initialization process and
@@ -42,4 +53,3 @@ Zope appserver support:
 - What would be really cool is to preload Zope & Plone component and then fork
   right before loading your specific products. might require some nasty zope
   hacks.
-  

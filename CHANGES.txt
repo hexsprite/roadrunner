@@ -1,0 +1,25 @@
+Changelog
+---------
+
+0.2.1 (May 26, 2008)
+====================
+
+- fixed bug in the buildout recipe that excluded Zope from the sys.path. Bug
+  crept in because of "dirty" python install. virtualenv --no-site-packages is
+  your friend.
+
+- removed an annoying child process message.
+
+0.2 (May 25, 2008)
+==================
+
+-  added a zc.buildout recipe to setup roadrunner with Plone
+
+-  fixed globbing for packages under test
+
+-  fixed child signal handling so you can reliably interrupt running tests without killing the parent 
+
+0.1  (May 18, 2008)
+===================
+
+Initial public version

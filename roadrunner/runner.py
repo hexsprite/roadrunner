@@ -15,8 +15,12 @@ def run_commandloop(args):
         cmdline = raw_input("rr> ").strip()
 
         if cmdline:
-            cmdargs = shlex.split(cmdline)
-
+            try:
+                cmdargs = shlex.split(cmdline)
+            except ValueError: # problem parsing line
+                print "Cmdline syntax error"
+                continue
+                
             if cmdargs[0] in ('quit', 'exit'):
                 sys.exit(0)
 
@@ -80,15 +84,11 @@ def plone(zope_conf, preload_modules, packages_under_test, zope2_location, build
         pid = os.fork()
         if not pid:
             # Run tests in child process
-            try:
-                t1 = time.time()
-                rc = testrunner.run(defaults=defaults, args=[sys.argv[0]] + args,
-                                    setup_layers=setup_layers)
-                t2 = time.time()
-                print 'Testrunner took: %0.3f seconds.  ' % ((t2-t1))
-            except KeyboardInterrupt:
-                rc=1
-                print "Signal received"
+            t1 = time.time()
+            rc = testrunner.run(defaults=defaults, args=[sys.argv[0]] + args,
+                                setup_layers=setup_layers)
+            t2 = time.time()
+            print 'Testrunner took: %0.3f seconds.  ' % ((t2-t1))
             sys.exit(rc)
 
         else:
@@ -96,12 +96,14 @@ def plone(zope_conf, preload_modules, packages_under_test, zope2_location, build
             try:
                 register_signal_handlers(pid)
                 try:
+                    # os.wait() can throw OSError
                     status = os.wait()
                     saved_time += preload_time
                     if saved_time:
                         print "Saved time so far: %0.3f seconds." % saved_time
                 except OSError:
-                    print "\nchild process was interrupted!"
+                    # TODO: maybe need something smarter here, maybe not?
+                    pass
             finally:
                 ignore_signal_handlers()
                 
@@ -207,22 +209,20 @@ def testrunner_defaults():
 
 original_signal_handler = None
 def register_signal_handlers(pid):
-    # propogate signals to child process
+    "propogate signals to child process"
     def interrupt_handler(signum, frame, pid=pid):
         try:
-            # print "roadrunner parent process received interrupt, killing child pid %s" % pid
             os.kill(pid, signal.SIGKILL)
+            print # clear the line
         except OSError, e:
             print str(e), pid
 
     signal.signal(signal.SIGINT, interrupt_handler)
-    # print "registered signal handler to kill pid %s" % pid
 
 def default_int_handler(signum, frame):
-    print "Interrupt received. Type 'exit' to quit."
+    print "\nInterrupt received. Type 'exit' to quit."
     
 def ignore_signal_handlers():
-    # restore signal handler
-    # print "restoerd default signal handler"
+    "restore signal handler"
     signal.signal(signal.SIGINT, default_int_handler)
 

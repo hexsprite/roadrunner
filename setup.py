@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import sys, os
 
-version = '0.1.1'
+version = '0.2.1'
 
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
@@ -10,16 +10,17 @@ long_description=(
         read('README.txt')
         + '\n' +
         read('CHANGES.txt')
-        + '\n' +
-        'Download\n'
-        '**********************\n'
+        + '\n'
+        # 'Download\n'
+        # '**********************\n'
         )
-        
+
+file('doc.txt', 'w').write(long_description)
+
 setup(name='roadrunner',
       version=version,
-      description="",
-      long_description="""\
-""",
+      description="testrunner for test-driven development",
+      long_description=long_description,
       classifiers=[], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
       keywords='zope buildout TDD testing',
       author='Jordan Baker',

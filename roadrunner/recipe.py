@@ -45,9 +45,11 @@ packages_under_test = %(packages_under_test)s
 zope2_location = '%(zope2_location)s'
 buildout_home = '%(buildout_home)s'
 part_dir = '%(part_dir)s'
+sys.path[0:0] = [zope2_location + "/lib/python"]
 """ % vars
         options['arguments'] = 'zope_conf, preload_modules, packages_under_test, zope2_location, buildout_home, part_dir'
-        options['extra_paths']="%(zope2_location)s/lib/python" % vars
+        # TODO: extra_paths doesn't seem to work...?
+        options['extra_paths']= "%(zope2_location)s/lib/python" % vars
         options['scripts'] = 'rrplone=' + self.name 
             
         return super(RoadrunnerRecipe, self).install()
