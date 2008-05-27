@@ -65,7 +65,6 @@ def plone(zope_conf, preload_modules, packages_under_test, zope2_location, build
     ## preload test environment
     t1 = time.time()
     setup_layers = preload_plone(part_dir)
-    #setup_layers = {}
     t2 = time.time()
     preload_time = t2-t1
     print 'Preloading took: %0.3f seconds.' % (preload_time)
