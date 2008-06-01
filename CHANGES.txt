@@ -1,6 +1,18 @@
 Changelog
 ---------
 
+0.2.2 (Jun 1, 2008)
+===================
+
+Bugs Fixed:
+
+- zope2/lib/python was being placed at the very start of the path which didn't
+  allow newer eggs to be seen. Now placed at the end of sys.path.
+
+New Features:
+
+- hack to reset terminal after you kill PDB. May need work for Windows.
+
 0.2.1 (May 26, 2008)
 ====================
 

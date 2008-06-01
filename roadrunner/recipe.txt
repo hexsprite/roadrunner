@@ -1,0 +1,46 @@
+Roadrunner Buildout Recipe
+==========================
+
+First off let's create a sample buildout for roadrunner to run
+
+  >>> import os
+  >>> mkdir('parts', 'instance')
+  >>> mkdir('parts', 'instance', 'etc')
+  >>> mkdir('parts', 'instance', 'etc', 'package-includes')
+  >>> write('parts', 'instance', 'etc', 'package-includes', '001-mypackage-configure.zcml', '')  
+  >>> write('parts', 'instance', 'etc', 'package-includes', '002-otherpackage-configure.zcml', '')  
+  >>> write('parts', 'instance', 'etc', 'zope.conf', """
+  ... foo
+  ... """)
+
+  >>> write(sample_buildout, 'buildout.cfg', """
+  ... [buildout]
+  ... parts=roadrunner
+  ... develop=%s/..
+  ... [roadrunner]
+  ... recipe=roadrunner:plone
+  ... packages-under-test=mypackage
+  ...
+  ... [instance]
+  ... zope2-location=parts/zope2
+  ... location=parts/instance
+  ... eggs=
+  ... """ % os.path.dirname(__file__))
+  
+  >>> buildout = os.path.join('bin', 'buildout')
+  >>> print system(buildout + " -N") # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+  Develop: '.../roadrunner/..'
+  Installing roadrunner.
+  Generated script '.../sample-buildout/bin/roadrunner'.
+  <BLANKLINE>
+
+We should have a new part called roadrunner
+
+  >>> ls('parts')
+  d  instance
+  d  roadrunner
+
+This part is the same as the instance except the tested package is filtered
+
+  >>> ls('parts', 'roadrunner', 'etc', 'package-includes')
+  -  002-otherpackage-configure.zcml

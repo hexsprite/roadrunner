@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import sys, os
 
-version = '0.2.1'
+version = '0.2.2'
 
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
@@ -31,7 +31,6 @@ setup(name='roadrunner',
       include_package_data=True,
       zip_safe=False,
       install_requires=[
-          'pexpect', # should really be a test_requires
           'zc.recipe.egg',
           'zc.buildout',
       ],

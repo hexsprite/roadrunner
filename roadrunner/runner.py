@@ -105,6 +105,8 @@ def plone(zope_conf, preload_modules, packages_under_test, zope2_location, build
                     pass
             finally:
                 ignore_signal_handlers()
+                # TODO: deal with windows
+                os.system("stty echo") # HACK
                 
             args = run_commandloop(args)
 

@@ -21,7 +21,7 @@ def test_suite():
     globs = dict(plone_buildout_cfg=plone_buildout_cfg)
     suite = unittest.TestSuite((
         doctest.DocFileSuite(
-            'README.txt',
+            'recipe.txt',
             setUp=setUp, tearDown=zc.buildout.testing.buildoutTearDown,
             globs=globs,
             checker=renormalizing.RENormalizing([
@@ -33,7 +33,7 @@ def test_suite():
                 'roadrunner'),
                (re.compile('[-d]  setuptools-[^-]+-'), 'setuptools-X-')
                ]),
-            optionflags=doctest.ABORT_AFTER_FIRST_FAILURE,
+            # optionflags=doctest.ABORT_AFTER_FIRST_FAILURE,
             ),
         ))
     

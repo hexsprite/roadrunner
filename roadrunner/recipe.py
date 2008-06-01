@@ -13,7 +13,6 @@ class RoadrunnerRecipe(Scripts):
         self.instance_part = buildout[options.get('zope2-instance', 'instance')]
         self.part_dir = self.buildout['buildout']['directory'] + "/parts/" + self.name
         self.packages_under_test = options.get('packages-under-test', '').split()
-        options['eggs'] = self.instance_part['eggs']
 
     def install(self):
         """
@@ -37,7 +36,8 @@ class RoadrunnerRecipe(Scripts):
             buildout_home = self.buildout['buildout']['directory'],
             part_dir = self.part_dir
         )
-        options['eggs'] += '\n'.join((self.instance_part['eggs'], 'roadrunner'))
+
+        options['eggs'] = '\n'.join(options.get('eggs', '').split() + self.instance_part['eggs'].split() + ['roadrunner'])
         options['initialization'] = """\
 zope_conf = '%(part_dir)s/etc/zope.conf'
 preload_modules = '%(preload_modules)s'
@@ -45,7 +45,7 @@ packages_under_test = %(packages_under_test)s
 zope2_location = '%(zope2_location)s'
 buildout_home = '%(buildout_home)s'
 part_dir = '%(part_dir)s'
-sys.path[0:0] = [zope2_location + "/lib/python"]
+sys.path.append(zope2_location + "/lib/python")
 """ % vars
         options['arguments'] = 'zope_conf, preload_modules, packages_under_test, zope2_location, buildout_home, part_dir'
         # TODO: extra_paths doesn't seem to work...?
@@ -89,7 +89,6 @@ class RoadrunnerPloneRecipe(RoadrunnerRecipe):
             for filename in filenames:
                 if self.is_package_under_test(filename):
                     path = dirpath + "/" + filename
-                    print "removing", path
                     os.remove(path)
         
         # rewrite the old paths => new in zope.conf
