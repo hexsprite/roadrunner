@@ -36,6 +36,13 @@ It will preload Zope & Plone, then fork off the first testrunner. Once the
 first testrunner is complete you will receive the roadrunner prompt where
 you launch additional tests.
 
+Recipe Options
+==============
+
+zope2-instance:
+
+The zope2 instance to use for basing the installation on.  Defaults to 'instance'.
+
 Gotchas
 =======
 
