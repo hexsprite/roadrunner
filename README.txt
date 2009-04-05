@@ -79,7 +79,18 @@ plone.reload / ReloadNG:
   Zope2. roadrunner by comparison just gives up trying to hack Zope2 and
   relies on a process checkpoint method.  I'm still trying to figure out
   if plone.reload could help roadrunner and vice versa.
-  
+
+Source & Bug Tracker
+====================
+
+Source Code:
+
+  http://github.com/hexsprite/roadrunner
+
+Tracker:
+
+  http://hexsprite.lighthouseapp.com/projects/21973-roadrunner
+
 Tested With
 ===========
 
