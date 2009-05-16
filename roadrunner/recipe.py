@@ -37,7 +37,8 @@ class RoadrunnerRecipe(Scripts):
             part_dir = self.part_dir
         )
 
-        options['eggs'] = '\n'.join(options.get('eggs', '').split() + self.instance_part['eggs'].split() + ['roadrunner'])
+        options['eggs'] = ( '\n'.join(options.get('eggs', '').split() + 
+            self.instance_part['eggs'].split() + ['roadrunner']) )
         options['initialization'] = """\
 zope_conf = '%(part_dir)s/etc/zope.conf'
 preload_modules = '%(preload_modules)s'
@@ -51,7 +52,7 @@ sys.path.append(zope2_location + "/lib/python")
         # TODO: extra_paths doesn't seem to work...?
         options['extra_paths']= "%(zope2_location)s/lib/python" % vars
         options['scripts'] = 'rrplone=' + self.name 
-            
+        
         return super(RoadrunnerRecipe, self).install()
         
     def update(self):
@@ -61,7 +62,7 @@ class RoadrunnerPloneRecipe(RoadrunnerRecipe):
     """
     zope recipe options:
     
-    zope_instance = <zope_instance>
+    zope_instance
     """
     
     # def __init__(self, buildout, name, options):
@@ -101,7 +102,3 @@ class RoadrunnerPloneRecipe(RoadrunnerRecipe):
         self.configure_roadrunner_instance()
         
         return super(RoadrunnerPloneRecipe, self).install() + [self.part_dir]
-        
-    def update(self):
-        pass
-        
