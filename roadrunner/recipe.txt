@@ -44,3 +44,79 @@ This part is the same as the instance except the tested package is filtered
 
   >>> ls('parts', 'roadrunner', 'etc', 'package-includes')
   -  002-otherpackage-configure.zcml
+
+Regenerating
+************
+
+We need to regenerate when a dependency is added.  For example:
+
+Let's create a dummy module
+
+>>> mkdir(sample_buildout, 'some-dependency')
+
+We'll need a setup.py so setuptools will work
+
+>>> write(sample_buildout, 'some-dependency', 'setup.py',
+... """
+... from setuptools import setup
+...
+... setup(
+...     name = "some-dependency",
+...     )
+... """)
+
+And update our buildout again:
+
+>>> write(sample_buildout, 'buildout.cfg', """
+... [buildout]
+... parts=roadrunner
+... develop=%s/.. some-dependency
+... [roadrunner]
+... recipe=roadrunner:plone
+... packages-under-test=mypackage
+...
+... [instance]
+... zope2-location=parts/zope2
+... location=parts/instance
+... eggs=some-dependency
+... """ % os.path.dirname(__file__))
+
+>>> import pdb; pdb.set_trace()
+>>> buildout = os.path.join('bin', 'buildout')
+>>> print system(buildout + " -N") # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+Develop: '/Users/jbb/co/roadrunner/roadrunner/..'
+Develop: '/sample-buildout/some-dependency'
+Updating roadrunner.
+Generated script '/sample-buildout/bin/roadrunner'.
+<BLANKLINE>
+
+Now let's check the generated roadrunner script path.
+
+Sorry if the path fails on your system.
+If you know how to fix it please let me know.
+
+>>> cat(sample_buildout, 'bin', 'roadrunner')
+#!/usr/local/bin/python2.4
+<BLANKLINE>
+import sys
+sys.path[0:0] = [
+  '/sample-buildout/some-dependency',
+  '/Users/jbb/co/roadrunner',
+  '/sample-buildout/eggs/roadrunner',
+  '/Users/jbb/.buildout/eggs/zc.recipe.egg-1.2.2-pyN.N.egg',
+  '/sample-buildout/eggs/setuptools-0.6c9-pyN.N.egg',
+  ]
+<BLANKLINE>
+zope_conf = '/sample-buildout/parts/roadrunner/etc/zope.conf'
+preload_modules = ''
+packages_under_test = ['mypackage']
+zope2_location = 'parts/zope2'
+buildout_home = '/sample-buildout'
+part_dir = '/sample-buildout/parts/roadrunner'
+sys.path.append(zope2_location + "/lib/python")
+<BLANKLINE>
+<BLANKLINE>
+import roadrunner.runner
+<BLANKLINE>
+if __name__ == '__main__':
+    roadrunner.runner.plone(zope_conf, preload_modules, packages_under_test, zope2_location, buildout_home, part_dir)

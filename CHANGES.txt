@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+0.3 (unreleased)
+================
+
+- Bug #2: the roadrunner script was not being updated properly.  now when you
+  re-run buildout it will pickup new dependencies. [hexsprite]
+
 0.2.2 (Jun 1, 2008)
 ===================
 
@@ -29,7 +35,8 @@ New Features:
 
 -  fixed globbing for packages under test
 
--  fixed child signal handling so you can reliably interrupt running tests without killing the parent 
+-  fixed child signal handling so you can reliably interrupt running tests
+   without killing the parent 
 
 0.1  (May 18, 2008)
 ===================
