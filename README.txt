@@ -1,7 +1,7 @@
 Waiting for stuff sucks.
 
 roadrunner is a looping testrunner with environment preloading for test-driven
-development.
+development.  It makes integration testing with Plone much faster.
 
 It preloads a standard Zope & Plone test environment compatible with
 PloneTestCase. After the first load of the test environment I have been 
@@ -41,7 +41,8 @@ Recipe Options
 
 zope2-instance:
 
-The zope2 instance to use for basing the installation on.  Defaults to 'instance'.
+The zope2 instance to use for basing the installation on. Defaults 
+to 'instance'.
 
 Gotchas
 =======
@@ -71,14 +72,7 @@ Gotchas
 Other options to speed up Plone testing
 =======================================
 
-plone.reload / ReloadNG:
-
-- These two rely on Guido's xreload module.
-
-- It needs a lot of hacks to make it work because of complicated bits in
-  Zope2. roadrunner by comparison just gives up trying to hack Zope2 and
-  relies on a process checkpoint method.  I'm still trying to figure out
-  if plone.reload could help roadrunner and vice versa.
+plone.reload is excellent to do exploratory testing.
 
 Source & Bug Tracker
 ====================
@@ -94,7 +88,9 @@ Tracker:
 Tested With
 ===========
 
-Plone 3.1. Let me know if you get it working on anything else.
+Plone 3.1.x Let me know if you get it working on anything else.
+
+Have also had reports of success with Plone 2.5.x
 
 Author
 ======
