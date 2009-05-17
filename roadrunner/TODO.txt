@@ -1,12 +1,25 @@
 TODO
 ====
 
-- bug: killing pdb sometimes results in stty -echo behaviour
+- ConfigurationError: ('Unknown directive', u'http://namespaces.zope.org/five', u'registerPackage')
+
+Use Products.Five.testbrowser in Plone instead of 
+
+- !!! remove testrunner code and monkey patch instead
 
 - saved time not working anymore !
 
-- restart the whole shebang if something preloaded changes.
+- Restart the whole shebang if something preloaded changes:
   https://bugs.launchpad.net/grok/+bug/213269
+  
+Could try using plone.reload first, then if that doesn't work then it could reload everything.
+
+First need a way to detect changes, plone.reload already has that.
+
+It should detect both ZCML and python code changes and trigger the appropriate
+plone.reload function.
+
+basically scan the 
 
 - ability to preload any arbitrary layers, plus some presets like --plone or
   --grok
@@ -42,14 +55,7 @@ after the main Zope init.
 something like:
 
 process.restore('zope:after', next_action='plone')
-
-- integrate a way to reload the modules. if its a Zope module we need to be
-  able to re-init. how does Zope's reload module do it?
-
-from App import RefeshFuncs
-
-
-
+\
 Zope appserver support:
 
 - What would be really cool is to preload Zope & Plone component and then fork
