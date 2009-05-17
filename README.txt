@@ -72,6 +72,13 @@ It will preload Zope & Plone, then fork off the first testrunner. Once the
 first testrunner is complete you will receive the roadrunner prompt where
 you launch additional tests.
 
+Recipe Options
+==============
+
+zope2-instance:
+
+The zope2 instance to use for basing the installation on.  Defaults to 'instance'.
+
 Gotchas
 =======
 
@@ -102,11 +109,21 @@ Gotchas
 Other options to speed up Plone testing
 =======================================
 
-
 - plone.reload, which relies on Guido's xreload module and some extra patches
   to work with Zope. Works quite well for TTW software testing and
   development. In future releases I may find a way to incorporate it into
   roadrunner.
+
+Source & Bug Tracker
+====================
+
+Source Code:
+
+  http://github.com/hexsprite/roadrunner
+
+Tracker:
+
+  http://hexsprite.lighthouseapp.com/projects/21973-roadrunner
 
 Tested With
 ===========
