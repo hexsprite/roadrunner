@@ -4,6 +4,9 @@ roadrunner
 from roadrunner import testrunner
 import os, sys, time, signal, shlex
 
+# apply platform specific patches
+import roadrunner.platform; roadrunner
+
 try:
     import readline
     HAVE_READLINE=True
