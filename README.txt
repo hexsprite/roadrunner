@@ -105,13 +105,19 @@ Gotchas
 - Because it preloads the Plone environment you won't be able to see changes
   to the Core Plone components.  However, it should see all changes in your
   application code which is what you will most likely be changing anyways.
-  
-  This is being worked on.
 
 Other options to speed up Plone testing
 =======================================
 
-plone.reload is excellent to do exploratory testing.
+plone.reload is excellent to do exploratory testing and development.
+
+Known Issues
+============
+
+- ZCML registrations lost.  This can occur if you run unit tests which employ
+PlacelessSetup.  A simple workaround is to avoid running unit tests and
+integration tests together with roadrunner.  You can run them separately
+without issue.
 
 Source & Bug Tracker
 ====================

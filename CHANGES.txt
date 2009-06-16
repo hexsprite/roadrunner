@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-0.3 (unreleased)
+0.2.3 (Jun 16, 2009)
 ================
 
 - Bug #4: OSX Core errors due to no exec after fork.
