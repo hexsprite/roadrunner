@@ -1,0 +1,3 @@
+This is a reminder on how to release to PyPI properly:
+
+python2.4 setup.py egg_info -rDb "" sdist bdist_egg upload
