@@ -1,7 +1,6 @@
 """
 roadrunner
 """
-from roadrunner import testrunner
 import os, sys, time, signal, shlex
 
 # apply platform specific patches
@@ -56,7 +55,12 @@ def run_commandloop(args):
 
     return args
 
-# 
+
+# minimal rr
+# bootstrap_zope(zope_conf)
+# setup_layers = preload_plone()
+#defaults = setup_paths(defaults, software_home, buildout_home)
+
 def plone(zope_conf, preload_modules, packages_under_test, zope2_location, buildout_home, part_dir, args=sys.argv):
     software_home = zope2_location + "/lib/python"
     sys.argv = sys.argv[0:1] # Zope configure whines about argv stuff make it shutup
@@ -67,12 +71,12 @@ def plone(zope_conf, preload_modules, packages_under_test, zope2_location, build
 
     ## preload test environment
     t1 = time.time()
-    setup_layers = preload_plone(part_dir)
+    setup_layers = preload_plone()
     t2 = time.time()
     preload_time = t2-t1
     print 'Preloading took: %0.3f seconds.' % (preload_time)
 
-    defaults = testrunner_defaults()
+    defaults = ['--tests-pattern', '^tests$', '-v', '-k']
     defaults = setup_paths(defaults, software_home, buildout_home)
     
     # start out negative because the first run through we don't actually save time
@@ -81,24 +85,32 @@ def plone(zope_conf, preload_modules, packages_under_test, zope2_location, build
     
     ignore_signal_handlers()
     signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+
     while 1:
         # Test Loop Start
         pid = os.fork()
         if not pid:
             # Run tests in child process
             t1 = time.time()
-            rc = testrunner.run(defaults=defaults, args=[sys.argv[0]] + args,
+            from roadrunner.run import Roadrunner
+            runner = Roadrunner(defaults=defaults, args=[sys.argv[0]] + args,
                                 setup_layers=setup_layers)
+            # def __init__(self, defaults=None, args=None, found_suites=None,
+            #              options=None, script_parts=None, setup_layers=None):
+            # 
+            # rc = testrunner.run(defaults=defaults, args=[sys.argv[0]] + args,
+            #                     setup_layers=setup_layers)
+            rc = runner.run()
             t2 = time.time()
             print 'Testrunner took: %0.3f seconds.  ' % ((t2-t1))
-            sys.exit(rc)
+            sys.exit(0)
 
         else:
             # In parent process
             try:
                 register_signal_handlers(pid)
                 try:
-                    # os.wait() can throw OSError
+                    # os.wait() can raise OSError
                     status = os.wait()
                     saved_time += preload_time
                     if saved_time:
@@ -157,6 +169,7 @@ If you have readline you can use that to search your history.
 def setup_paths(defaults, software_home, buildout_home):
     """
     this code is from Zope's test.py
+    in more recent Zope it is moved into http://svn.plone.org/svn/collective/buildout/plone.recipe.zope2instance/trunk/src/plone/recipe/zope2instance/ctl.py
     """
     # Put all packages found in products directories on the test-path.
     import Products
@@ -191,25 +204,28 @@ def setup_paths(defaults, software_home, buildout_home):
 
     return defaults
 
-def preload_plone(conf):
-    print "Preloading Plone ..."
+
+def setup_plone():
     from Products.PloneTestCase.layer import PloneSite
     from Products.PloneTestCase import PloneTestCase as ptc
     ptc.setupPloneSite()
+    return PloneSite
+
+def preload_plone():
+    print "Preloading Plone ..."
+    plone_layer = setup_plone()
     # pre-setup Plone layer
     setup_layers={}
-    testrunner.setup_layer(PloneSite, setup_layers)
+    from zope.testing.testrunner import runner
+    from zope.testing.testrunner.options import get_options
+    options = get_options([], [])
+    runner.setup_layer(options, plone_layer, setup_layers)
     # delete the plone layer registration so that the testrunner
     # will re-run Plone layer setUp after deferred setups have
     # been registered by the associated tests.
-    del setup_layers[PloneSite] 
+    del setup_layers[plone_layer] 
     return setup_layers
 
-def testrunner_defaults():
-    defaults = '--tests-pattern ^tests$ -v'.split()
-    defaults += ['-k']
-    
-    return defaults
 
 original_signal_handler = None
 def register_signal_handlers(pid):

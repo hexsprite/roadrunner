@@ -26,8 +26,29 @@ class ScriptsMock(zc.recipe.egg.egg.Scripts):
         self.buildout = buildout
         self.name = name
         self.options = options
+        
     def install(self, *args, **kwargs):
         return []
+
+def fake_setup_layer(layer, setup_layers):
+    setup_layers[layer] = True
+    
+class RunnerTests(MockerTestCase):
+    def test_preload_plone(self):
+        from roadrunner import runner
+
+        setup_plone = self.mocker.replace('roadrunner.runner.setup_plone')
+        setup_plone()
+        self.mocker.result(None)
+
+        setup_layer = self.mocker.replace('roadrunner.testrunner.setup_layer')
+        setup_layer(None, {})
+        self.mocker.call(fake_setup_layer)
+        
+        self.mocker.replay()
+        
+        layers = runner.preload_plone()
+        self.assertEquals(layers, {})
 
 class RoadrunnnerRecipeTests(MockerTestCase):
     def test_basic_recipe(self):
@@ -88,19 +109,19 @@ class RoadrunnnerRecipeTests(MockerTestCase):
 
         unmock_recipe()
 
-    def test_update(self):
-        mock_recipe()
-        buildout = {'buildout': {'directory': '/fake'}, 'instance': None}
-        options = {'packages-under-test': 'package.*'}
-        recipe = RoadrunnerPloneRecipe(buildout, 'roadrunner', options)
-        recipe.install = self.mocker.mock()
-        
-        #self.mocker.replace(recipe.install)
-        self.mocker.expect(self.install()).result()
-        self.mocker.replay()
-        
-        self.assertRquals(recipe.update(), 0)
-        unmock_recipe()
+    # def test_update(self):
+    #     mock_recipe()
+    #     buildout = {'buildout': {'directory': '/fake'}, 'instance': None}
+    #     options = {'packages-under-test': 'package.*'}
+    #     recipe = RoadrunnerPloneRecipe(buildout, 'roadrunner', options)
+    #     recipe.install = self.mocker.mock()
+    #     
+    #     #x``self.mocker.replace(recipe.install)
+    #     self.mocker.expect(self.install()).result()
+    #     self.mocker.replay()
+    #     
+    #     self.assertRquals(recipe.update(), 0)
+    #     unmock_recipe()
         
 original_bases = None
 def mock_recipe():
@@ -112,30 +133,33 @@ def mock_recipe():
 def unmock_recipe():
     from roadrunner.recipe import RoadrunnerPloneRecipe, RoadrunnerRecipe
     RoadrunnerRecipe.__bases__ = original_bases
-    
+
 def test_suite():
-    globs = dict(plone_buildout_cfg=plone_buildout_cfg)
-    suite = unittest.TestSuite()
-    # suite = unittest.TestSuite((
-    #     doctest.DocFileSuite(
-    #         'recipe.txt',
-    #         setUp=setUp, tearDown=zc.buildout.testing.buildoutTearDown,
-    #         globs=globs,
-    #         checker=renormalizing.RENormalizing([
-    #            zc.buildout.testing.normalize_path,
-    #            zc.buildout.testing.normalize_script,
-    #            zc.buildout.testing.normalize_egg_py,
-    #            zc.buildout.tests.normalize_bang,
-    #            (re.compile('zc.buildout(-\S+)?[.]egg(-link)?'),
-    #             'roadrunner'),
-    #            (re.compile('[-d]  setuptools-[^-]+-'), 'setuptools-X-')
-    #            ]),
-    #         # optionflags=doctest.ABORT_AFTER_FIRST_FAILURE,
-    #         ),
-    #     ))
-    suite.addTest(unittest.makeSuite(RoadrunnnerRecipeTests))
+    return unittest.defaultTestLoader.loadTestsFromName(__name__)
     
-    return suite
+# def test_suite():
+#     globs = dict(plone_buildout_cfg=plone_buildout_cfg)
+#     suite = unittest.TestSuite()
+#     # suite = unittest.TestSuite((
+#     #     doctest.DocFileSuite(
+#     #         'recipe.txt',
+#     #         setUp=setUp, tearDown=zc.buildout.testing.buildoutTearDown,
+#     #         globs=globs,
+#     #         checker=renormalizing.RENormalizing([
+#     #            zc.buildout.testing.normalize_path,
+#     #            zc.buildout.testing.normalize_script,
+#     #            zc.buildout.testing.normalize_egg_py,
+#     #            zc.buildout.tests.normalize_bang,
+#     #            (re.compile('zc.buildout(-\S+)?[.]egg(-link)?'),
+#     #             'roadrunner'),
+#     #            (re.compile('[-d]  setuptools-[^-]+-'), 'setuptools-X-')
+#     #            ]),
+#     #         # optionflags=doctest.ABORT_AFTER_FIRST_FAILURE,
+#     #         ),
+#     #     ))
+#     suite.addTest(unittest.makeSuite(RoadrunnnerRecipeTests))
+#     
+#     return suite
     
 plone_buildout_cfg = """\
 [buildout]

@@ -5,3 +5,5 @@ bin
 develop-eggs
 lib
 .installed.cfg
+parts
+src
