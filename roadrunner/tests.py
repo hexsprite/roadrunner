@@ -16,7 +16,50 @@ def dirname(d, level=1):
 
 def setUp(test):
     zc.buildout.tests.easy_install_SetUp(test)
+
+from mocker import MockerTestCase
+
+# from zc.recipe.egg.egg import Scripts
+class ScriptsMock(zc.recipe.egg.egg.Scripts):
+    def __init__(self, buildout, name, options):
+        self.buildout = buildout
+        self.name = name
+    def install(self, *args, **kwargs):
+        pass
     
+class RoadrunnnerRecipeTests(MockerTestCase):
+    def test_basic_recipe(self):
+        # from zc.buildout.buildout import Buildout
+        # buildout = Buildout(config_file='../../plone.cfg', cloptions={})
+        # from mocker import Mocker
+        # mocker = Mocker()
+#        buildout = self.mocker.mock(type=Buildout)
+#        scripts = self.mocker.replace("zc.recipe.egg.egg.Scripts")
+        self.mocker.replace('os.path.exists')().result(True)
+        self.mocker.replace('os.mkdir')().result(True)
+        ct = self.mocker.replace('shutil.copytree')
+        ct()
+        self.mocker.result(True)
+        
+        from roadrunner.recipe import RoadrunnerPloneRecipe, RoadrunnerRecipe
+        RoadrunnerRecipe.__bases__ = (ScriptsMock,)
+        
+        self.mocker.replay()
+        buildout = dict(
+            buildout={
+                'eggs-directory': '',
+                'directory': '/fake',
+            },
+            instance = {
+                'location': '/tmp',
+            },
+        )
+        options = {
+#            'zope2-instance': 'instance'
+        }
+        recipe = RoadrunnerPloneRecipe(buildout, 'roadrunner', options)
+        recipe.install()
+
 def test_suite():
     globs = dict(plone_buildout_cfg=plone_buildout_cfg)
     suite = unittest.TestSuite((
@@ -36,6 +79,7 @@ def test_suite():
             # optionflags=doctest.ABORT_AFTER_FIRST_FAILURE,
             ),
         ))
+    suite.addTest(unittest.makeSuite(RoadrunnnerRecipeTests))
     
     return suite
     

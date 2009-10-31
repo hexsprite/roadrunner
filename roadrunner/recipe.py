@@ -64,9 +64,6 @@ class RoadrunnerPloneRecipe(RoadrunnerRecipe):
     
     zope_instance
     """
-    
-    # def __init__(self, buildout, name, options):
-    #     super(RoadrunnerPloneRecipe, self).__init__(buildout, name, options)
 
     def is_package_under_test(self, filepath):
         for pattern in self.packages_under_test:

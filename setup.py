@@ -33,6 +33,7 @@ setup(name='roadrunner',
       install_requires=[
           'zc.recipe.egg',
           'zc.buildout',
+          'mocker',
       ],
       entry_points = """
         [console_scripts]

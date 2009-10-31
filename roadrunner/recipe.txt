@@ -81,7 +81,6 @@ And update our buildout again:
 ... eggs=some-dependency
 ... """ % os.path.dirname(__file__))
 
->>> import pdb; pdb.set_trace()
 >>> buildout = os.path.join('bin', 'buildout')
 >>> print system(buildout + " -N") # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
 Develop: '/Users/jbb/co/roadrunner/roadrunner/..'
@@ -104,7 +103,7 @@ sys.path[0:0] = [
   '/Users/jbb/co/roadrunner',
   '/sample-buildout/eggs/roadrunner',
   '/Users/jbb/.buildout/eggs/zc.recipe.egg-1.2.2-pyN.N.egg',
-  '/sample-buildout/eggs/setuptools-0.6c9-pyN.N.egg',
+  '/sample-buildout/eggs/setuptools-0.6c11-pyN.N.egg',
   ]
 <BLANKLINE>
 zope_conf = '/sample-buildout/parts/roadrunner/etc/zope.conf'
