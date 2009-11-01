@@ -258,8 +258,9 @@ def preload_plone(options=None):
     if options is None:
         options = get_options([], [])
 
-    import zope.testing.testrunner
+    import zope.testing.testrunner.runner
     zope.testing.testrunner.runner.setup_layer(options, plone_layer, setup_layers)
+
     # delete the plone layer registration so that the testrunner
     # will re-run Plone layer setUp after deferred setups have
     # been registered by the associated tests.

@@ -37,6 +37,7 @@ setup(name='roadrunner',
       install_requires=[
           'zc.recipe.egg',
           'zc.buildout',
+          'zope.testing>=3.8.1'
       ],
       entry_points = """
         [console_scripts]
