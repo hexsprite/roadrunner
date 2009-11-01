@@ -1,4 +1,5 @@
-from zope.testing.testrunner.runner import Runner, CanNotTearDown, run_layer, tear_down_unneeded
+from zope.testing.testrunner.runner import Runner, CanNotTearDown, \
+    run_layer, tear_down_unneeded, resume_tests
 import zope.testing.testrunner.interfaces
 
 class Roadrunner(Runner):

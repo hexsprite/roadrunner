@@ -7,3 +7,4 @@ lib
 .installed.cfg
 parts
 src
+coverage

@@ -2,8 +2,11 @@
 roadrunner
 """
 import os, sys, time, signal, shlex
+from roadrunner.recipe import is_package_under_test
+from zope.testing.testrunner.options import get_options
 
 # apply platform specific patches
+# FIXME: import sideeffects
 import roadrunner.platform; roadrunner
 
 try:
@@ -55,13 +58,47 @@ def run_commandloop(args):
 
     return args
 
+deferred_include_zcml = []
+def filteringIncludeZCMLGroup(_context, info, filename, override=False):
+    global deferred_include_zcml
+    global packages_under_test_
 
-# minimal rr
-# bootstrap_zope(zope_conf)
-# setup_layers = preload_plone()
-#defaults = setup_paths(defaults, software_home, buildout_home)
+    newinfo = {}
+    deferredinfo = {}
+    for k, pkgs in info.items():
+        newpkgs = [ pkg for pkg in pkgs if not is_package_under_test(pkg, packages_under_test_) ]
+        deferred_pkgs = [ pkg for pkg in pkgs if is_package_under_test(pkg, packages_under_test_) ]
+        newinfo[k] = newpkgs
+        deferredinfo[k] = deferred_pkgs
+
+    deferred_include_zcml.append((_context, deferredinfo, filename, override))
+    original_includeZCMLGroup(_context, newinfo, filename, override)
+
+def include_deferred_zcml():
+    global deferred_include_zcml
+    z3c.autoinclude.zcml.includeZCMLGroup = original_includeZCMLGroup
+    for _context, deferredinfo, filename, override in deferred_include_zcml:
+        original_includeZCMLGroup(_context, deferredinfo, filename, override)
+    from Products.Five.zcml import _context
+    _context.execute_actions()
+
+try:
+    # TODO: this should eventually use some kind of yet to be contributed
+    # API for z3c.autoinclude that allows us to exclude the packages_under_test
+    # from being autoloaded
+    import z3c.autoinclude.zcml
+    original_includeZCMLGroup = z3c.autoinclude.zcml.includeZCMLGroup
+    z3c.autoinclude.zcml.includeZCMLGroup = filteringIncludeZCMLGroup
+except ImportError:
+    # no z3c.autoinclude
+    include_deferred_zcml = None
+    
+packages_under_test_ = []
 
 def plone(zope_conf, preload_modules, packages_under_test, zope2_location, buildout_home, part_dir, args=sys.argv):
+    global packages_under_test_
+    packages_under_test_ = packages_under_test
+
     software_home = zope2_location + "/lib/python"
     sys.argv = sys.argv[0:1] # Zope configure whines about argv stuff make it shutup
     bootstrap_zope(zope_conf)
@@ -93,13 +130,14 @@ def plone(zope_conf, preload_modules, packages_under_test, zope2_location, build
             # Run tests in child process
             t1 = time.time()
             from roadrunner.run import Roadrunner
+
+            # include any ZCML that was deferred from parent process
+            # eg. z3c.autoinclude
+            if include_deferred_zcml:
+                include_deferred_zcml()
+
             runner = Roadrunner(defaults=defaults, args=[sys.argv[0]] + args,
                                 setup_layers=setup_layers)
-            # def __init__(self, defaults=None, args=None, found_suites=None,
-            #              options=None, script_parts=None, setup_layers=None):
-            # 
-            # rc = testrunner.run(defaults=defaults, args=[sys.argv[0]] + args,
-            #                     setup_layers=setup_layers)
             rc = runner.run()
             t2 = time.time()
             print 'Testrunner took: %0.3f seconds.  ' % ((t2-t1))
@@ -208,18 +246,20 @@ def setup_paths(defaults, software_home, buildout_home):
 def setup_plone():
     from Products.PloneTestCase.layer import PloneSite
     from Products.PloneTestCase import PloneTestCase as ptc
+    print "Preloading Plone ..."
     ptc.setupPloneSite()
     return PloneSite
 
-def preload_plone():
-    print "Preloading Plone ..."
+def preload_plone(options=None):
     plone_layer = setup_plone()
     # pre-setup Plone layer
     setup_layers={}
-    from zope.testing.testrunner import runner
-    from zope.testing.testrunner.options import get_options
-    options = get_options([], [])
-    runner.setup_layer(options, plone_layer, setup_layers)
+
+    if options is None:
+        options = get_options([], [])
+
+    import zope.testing.testrunner
+    zope.testing.testrunner.runner.setup_layer(options, plone_layer, setup_layers)
     # delete the plone layer registration so that the testrunner
     # will re-run Plone layer setUp after deferred setups have
     # been registered by the associated tests.

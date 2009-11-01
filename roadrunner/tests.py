@@ -1,10 +1,11 @@
-import os, re, shutil, sys
+import os
+import re
 import zc.buildout.tests
 import zc.buildout.testing
 
 import unittest
 from zope.testing import doctest, renormalizing
-from roadrunner.recipe import RoadrunnerPloneRecipe, RoadrunnerRecipe
+from roadrunner.recipe import RoadrunnerPloneRecipe
 
 os_path_sep = os.path.sep
 if os_path_sep == '\\':
@@ -30,7 +31,7 @@ class ScriptsMock(zc.recipe.egg.egg.Scripts):
     def install(self, *args, **kwargs):
         return []
 
-def fake_setup_layer(layer, setup_layers):
+def fake_setup_layer(options, layer, setup_layers):
     setup_layers[layer] = True
     
 class RunnerTests(MockerTestCase):
@@ -41,13 +42,16 @@ class RunnerTests(MockerTestCase):
         setup_plone()
         self.mocker.result(None)
 
-        setup_layer = self.mocker.replace('roadrunner.testrunner.setup_layer')
-        setup_layer(None, {})
+        from zope.testing.testrunner.options import get_options
+        options = get_options([], [])
+
+        from mocker import ANY
+        setup_layer = self.mocker.replace('zope.testing.testrunner.runner.setup_layer')
+        setup_layer(ANY, ANY, ANY)
         self.mocker.call(fake_setup_layer)
         
         self.mocker.replay()
-        
-        layers = runner.preload_plone()
+        layers = runner.preload_plone(options=options)
         self.assertEquals(layers, {})
 
 class RoadrunnnerRecipeTests(MockerTestCase):
@@ -96,18 +100,10 @@ class RoadrunnnerRecipeTests(MockerTestCase):
         unmock_recipe()
     
     def test_packages_under_test(self):
-        # self.instance_part = buildout[options.get('zope2-instance', 'instance')]
-        # self.part_dir = self.buildout['buildout']['directory'] + "/parts/" + self.name
-        # self.packages_under_test = options.get('packages-under-test', '').split()
-        
-        mock_recipe()
-        buildout = {'buildout': {'directory': '/fake'}, 'instance': None}
-        options = {'packages-under-test': 'package.*'}
-        recipe = RoadrunnerPloneRecipe(buildout, 'roadrunner', options)
-        self.assertEquals(recipe.is_package_under_test('/fake/eggs/package.foo'), True)
-        self.assertEquals(recipe.is_package_under_test('/fake/eggs/other.foo'), False)
-
-        unmock_recipe()
+        from roadrunner.recipe import is_package_under_test
+        packages_under_test = ['package.*']
+        self.assertEquals(is_package_under_test('/fake/eggs/package.foo', packages_under_test), True)
+        self.assertEquals(is_package_under_test('/fake/eggs/other.foo', packages_under_test), False)
 
     # def test_update(self):
     #     mock_recipe()
@@ -125,41 +121,35 @@ class RoadrunnnerRecipeTests(MockerTestCase):
         
 original_bases = None
 def mock_recipe():
-    from roadrunner.recipe import RoadrunnerPloneRecipe, RoadrunnerRecipe
+    from roadrunner.recipe import RoadrunnerRecipe
     global original_bases
     original_bases = RoadrunnerRecipe.__bases__
     RoadrunnerRecipe.__bases__ = (ScriptsMock,)
 
 def unmock_recipe():
-    from roadrunner.recipe import RoadrunnerPloneRecipe, RoadrunnerRecipe
+    from roadrunner.recipe import RoadrunnerRecipe
     RoadrunnerRecipe.__bases__ = original_bases
 
 def test_suite():
-    return unittest.defaultTestLoader.loadTestsFromName(__name__)
+    suite = unittest.defaultTestLoader.loadTestsFromName(__name__)
     
-# def test_suite():
-#     globs = dict(plone_buildout_cfg=plone_buildout_cfg)
-#     suite = unittest.TestSuite()
-#     # suite = unittest.TestSuite((
-#     #     doctest.DocFileSuite(
-#     #         'recipe.txt',
-#     #         setUp=setUp, tearDown=zc.buildout.testing.buildoutTearDown,
-#     #         globs=globs,
-#     #         checker=renormalizing.RENormalizing([
-#     #            zc.buildout.testing.normalize_path,
-#     #            zc.buildout.testing.normalize_script,
-#     #            zc.buildout.testing.normalize_egg_py,
-#     #            zc.buildout.tests.normalize_bang,
-#     #            (re.compile('zc.buildout(-\S+)?[.]egg(-link)?'),
-#     #             'roadrunner'),
-#     #            (re.compile('[-d]  setuptools-[^-]+-'), 'setuptools-X-')
-#     #            ]),
-#     #         # optionflags=doctest.ABORT_AFTER_FIRST_FAILURE,
-#     #         ),
-#     #     ))
-#     suite.addTest(unittest.makeSuite(RoadrunnnerRecipeTests))
-#     
-#     return suite
+    globs = dict(plone_buildout_cfg=plone_buildout_cfg)
+    suite.addTest( doctest.DocFileSuite(
+        'recipe.txt',
+        setUp=setUp,
+        tearDown=zc.buildout.testing.buildoutTearDown,
+        globs=globs,
+        checker=renormalizing.RENormalizing([
+            zc.buildout.testing.normalize_path,
+            zc.buildout.testing.normalize_script,
+            zc.buildout.testing.normalize_egg_py,
+            zc.buildout.tests.normalize_bang,
+            (re.compile('zc.buildout(-\S+)?[.]egg(-link)?'),
+            'roadrunner'), (re.compile('[-d] setuptools-[^-]+-'),
+            'setuptools-X-') ]), #
+        optionflags=doctest.REPORT_ONLY_FIRST_FAILURE, ),
+        )
+    return suite
     
 plone_buildout_cfg = """\
 [buildout]

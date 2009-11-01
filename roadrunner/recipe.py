@@ -57,6 +57,12 @@ sys.path.append(zope2_location + "/lib/python")
         
     def update(self):
         return self.install()
+
+def is_package_under_test(filepath, packages_under_test):
+    for pattern in packages_under_test:
+        if fnmatch.fnmatch(filepath, '*' + pattern + '*'):
+            return True
+    return False
         
 class RoadrunnerPloneRecipe(RoadrunnerRecipe):
     """
@@ -64,12 +70,6 @@ class RoadrunnerPloneRecipe(RoadrunnerRecipe):
     
     zope_instance
     """
-
-    def is_package_under_test(self, filepath):
-        for pattern in self.packages_under_test:
-            if fnmatch.fnmatch(filepath, '*' + pattern + '*'):
-                return True
-        return False
         
     def configure_roadrunner_instance(self):
         """
@@ -85,7 +85,7 @@ class RoadrunnerPloneRecipe(RoadrunnerRecipe):
         zcml_dest = self.part_dir + "/etc/package-includes"
         for dirpath, dirnames, filenames in os.walk(zcml_dest):
             for filename in filenames:
-                if self.is_package_under_test(filename):
+                if is_package_under_test(filename, self.packages_under_test):
                     path = dirpath + "/" + filename
                     os.remove(path)
         
