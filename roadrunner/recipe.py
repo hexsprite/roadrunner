@@ -37,8 +37,8 @@ class RoadrunnerRecipe(Scripts):
             part_dir = self.part_dir
         )
 
-        options['eggs'] = ( '\n'.join(options.get('eggs', '').split() + 
-            self.instance_part['eggs'].split() + ['roadrunner']) )
+        options['eggs'] = ( '\n'.join(options.get('eggs', '').split('\n') + 
+            self.instance_part['eggs'].split('\n') + ['roadrunner']) )
         options['initialization'] = """\
 zope_conf = '%(part_dir)s/etc/zope.conf'
 preload_modules = '%(preload_modules)s'

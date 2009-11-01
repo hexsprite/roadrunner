@@ -4,6 +4,9 @@ Changelog
 0.3 (unreleased)
 ================
 
+- eggs was previously split on spaces which was causing problems. now splits
+on \n which is consistent with the rest of buildout
+
 - added more test coverage at Plone Conferernce 2009 Sprint [hexsprite, rob0t7]
 
 - now requires zope.testing 3.8.1 testrunner, recommend adding this to your versions buildout section.
