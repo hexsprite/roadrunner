@@ -215,7 +215,8 @@ def setup_paths(defaults, software_home, buildout_home):
     
     for path in Products.__path__:
         # ignore software home, as it already works
-        if not path.startswith(software_home):
+
+        if 0 or not path.startswith(software_home):
             # get all folders in the current products folder and filter
             # out everything that is not a directory or a VCS internal one.
             folders = [f for f in os.listdir(path) if

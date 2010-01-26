@@ -30,7 +30,7 @@ class RoadrunnerRecipe(Scripts):
         options = self.options
         vars = dict(
             instance_location = self.instance_part['location'],
-            zope2_location = self.instance_part['zope2-location'],
+            zope2_location = self.instance_part.get('zope2-location', ''),
             preload_modules = options.get('preload-modules', ''),
             packages_under_test = self.packages_under_test,
             buildout_home = self.buildout['buildout']['directory'],
